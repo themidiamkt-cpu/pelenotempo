@@ -218,6 +218,7 @@ const formFields = [
 ];
 
 const FORM_WEBHOOK_URL = "https://automacao2.themidiamarketing.com.br/webhook/form-audrei";
+const WHATSAPP_URL = "https://wa.me/5519982946890";
 
 function ButtonLink({ href, children, variant = "primary", className = "" }) {
   const base =
@@ -229,8 +230,15 @@ function ButtonLink({ href, children, variant = "primary", className = "" }) {
       "border border-[#C77871]/55 bg-[#4E2C2D]/70 text-[#CCAAA5] hover:border-[#C77871] hover:bg-[#3C2224] focus:ring-[#9D5955]",
   };
 
+  const isExternal = href.startsWith("http");
+
   return (
-    <a href={href} className={`${base} ${variants[variant]} ${className}`}>
+    <a
+      href={href}
+      className={`${base} ${variants[variant]} ${className}`}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noreferrer" : undefined}
+    >
       {children}
     </a>
   );
@@ -501,7 +509,7 @@ function LandingPage() {
             >
               Audrei
             </a>
-            <ButtonLink href="/formulario" variant="ghost">
+            <ButtonLink href={WHATSAPP_URL} variant="ghost">
               Aplicar
             </ButtonLink>
           </header>
@@ -527,10 +535,10 @@ function LandingPage() {
               </p>
 
               <div className="mx-auto mt-8 flex w-full max-w-xl flex-col justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
-                <ButtonLink href="/formulario">
+                <ButtonLink href={WHATSAPP_URL}>
                   Quero estruturar meu estúdio
                 </ButtonLink>
-                <ButtonLink href="/formulario" variant="ghost" className="mobile-secondary-cta">
+                <ButtonLink href={WHATSAPP_URL} variant="ghost" className="mobile-secondary-cta">
                   Quero crescer além do atendimento
                 </ButtonLink>
               </div>
@@ -609,7 +617,7 @@ function LandingPage() {
               Atendimento bonito. Negócio estruturado. Cliente valorizada.
             </p>
             <div className="mt-8">
-              <ButtonLink href="/formulario">Quero profissionalizar meu negócio</ButtonLink>
+              <ButtonLink href={WHATSAPP_URL}>Quero profissionalizar meu negócio</ButtonLink>
             </div>
           </div>
         </div>
@@ -695,7 +703,7 @@ function LandingPage() {
               direção.
             </p>
             <div className="mt-8">
-              <ButtonLink href="/formulario">Quero aplicar para a mentoria</ButtonLink>
+              <ButtonLink href={WHATSAPP_URL}>Quero aplicar para a mentoria</ButtonLink>
             </div>
           </div>
 
@@ -820,7 +828,7 @@ function LandingPage() {
             lucrativa, preencha o formulário de aplicação.
           </p>
           <div className="mt-9">
-            <ButtonLink href="/formulario">
+            <ButtonLink href={WHATSAPP_URL}>
               Quero profissionalizar meu negócio
             </ButtonLink>
           </div>
