@@ -217,6 +217,8 @@ const formFields = [
   },
 ];
 
+const FORM_WEBHOOK_URL = "https://automacao2.themidiamarketing.com.br/webhook/form-audrei";
+
 function ButtonLink({ href, children, variant = "primary", className = "" }) {
   const base =
     "shine-button inline-flex w-full items-center justify-center rounded-xl px-7 py-5 text-center text-[0.74rem] font-bold uppercase tracking-[0.18em] transition duration-300 focus:outline-none focus:ring-4 sm:w-auto sm:rounded-lg sm:px-6 sm:py-4 sm:text-[0.72rem] sm:tracking-[0.22em]";
@@ -878,11 +880,49 @@ function Field({ field }) {
 
 function InterestFormPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setSubmitted(true);
-    event.currentTarget.reset();
+    setSubmitted(false);
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const answers = Object.fromEntries(formData.entries());
+    const labeledAnswers = formFields.reduce((acc, field) => {
+      acc[field.label] = answers[field.id] || "";
+      return acc;
+    }, {});
+
+    try {
+      const response = await fetch(FORM_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          source: "Mentoria Body Piercer Audrei",
+          submittedAt: new Date().toISOString(),
+          pageUrl: window.location.href,
+          answers,
+          labeledAnswers,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Webhook request failed");
+      }
+
+      setSubmitted(true);
+      form.reset();
+    } catch (error) {
+      setSubmitError("Não foi possível enviar agora. Tente novamente em instantes.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -941,9 +981,10 @@ function InterestFormPage() {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="shine-button mt-8 w-full rounded-lg bg-[#C77871] px-6 py-4 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-[#3C2224] shadow-[0_16px_32px_rgba(199,120,113,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#3C2224] hover:text-[#E5DDDA] hover:shadow-[0_20px_40px_rgba(199,120,113,0.34)] focus:outline-none focus:ring-4 focus:ring-[#9D5955]"
             >
-              Enviar aplicação
+              {isSubmitting ? "Enviando..." : "Enviar aplicação"}
             </button>
 
             {submitted && (
@@ -952,6 +993,15 @@ function InterestFormPage() {
                 className="mt-5 rounded-lg border border-[#9D5955] bg-[#4E2C2D] px-4 py-3 text-center text-sm font-semibold text-[#CCAAA5]"
               >
                 Obrigada! Sua inscrição foi recebida.
+              </p>
+            )}
+
+            {submitError && (
+              <p
+                role="alert"
+                className="mt-5 rounded-lg border border-[#C77871] bg-[#4E2C2D] px-4 py-3 text-center text-sm font-semibold text-[#E5DDDA]"
+              >
+                {submitError}
               </p>
             )}
           </form>
